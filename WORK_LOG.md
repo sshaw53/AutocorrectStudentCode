@@ -1,9 +1,9 @@
-Name: YOUR NAME HERE
+Name: SIERRA SHAW
 
-| Date    |  Time  |                                     Update |
-|:--------|:------:|-------------------------------------------:|
-| April 5 | 9-10pm | I tried to write abstract, efficient code. |
-|         |        |                                            |
+| Date     |    Time     |                                                                                                                                                                                                                                                                                                                                                                                                                                         Update |
+|:---------|:-----------:|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+| March 12 | 2:30-4:30pm | Today, I figured out how to implement the Levenschtein distance algorithm. I had a ton of trouble figuring out how to sort by smallest distance and then alphabet, so that was really confusing. I had to use a ton of if and while statements to solve this aspect and a ton of debugging and trial & error, but now I have a working solution. Excited to work next class on a faster, more personalized way of sorting through these words. |
+|          |             |                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 
 
 To add a new row to the table, click into a cell and then hit shift-enter.

@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Autocorrect
@@ -8,7 +9,7 @@ import java.io.IOException;
  * A command-line tool to suggest similar words when given one not in the dictionary.
  * </p>
  * @author Zach Blick
- * @author YOUR NAME HERE
+ * @author SIERRA SHAW
  */
 public class Autocorrect {
 
@@ -17,8 +18,14 @@ public class Autocorrect {
      * @param words The dictionary of acceptable words.
      * @param threshold The maximum number of edits a suggestion can have.
      */
-    public Autocorrect(String[] words, int threshold) {
+    String[] words;
+    int threshold;
+    ArrayList<String> toReturn = new ArrayList<>();
+    ArrayList<Integer> toReturnValues = new ArrayList<>();
 
+    public Autocorrect(String[] words, int threshold) {
+        this.words = words;
+        this.threshold = threshold;
     }
 
     /**
@@ -28,10 +35,79 @@ public class Autocorrect {
      * to threshold, sorted by edit distnace, then sorted alphabetically.
      */
     public String[] runTest(String typed) {
+        int wordLen = words.length;
+        for (int i = 0; i < wordLen; i ++) {
+            int[][] changes = new int[typed.length() + 1][words[i].length() + 1];
+            int lev = lev(changes, typed, words[i]);
+            if (lev <= threshold) {
+                int insertIndex;
 
-        return new String[0];
+                if (!toReturnValues.isEmpty()) {
+                    insertIndex = toReturnValues.size();
+
+                    if (lev < toReturnValues.get(toReturnValues.size() - 1)) {
+                        insertIndex = toReturnValues.size() - 1;
+
+                        while (insertIndex > 0 && lev < toReturnValues.get(insertIndex - 1)) {
+                            insertIndex -= 1;
+                        }
+                    }
+                    if (lev == toReturnValues.get(insertIndex - 1)) {
+                        while (insertIndex > 0 && lev == toReturnValues.get(insertIndex - 1) &&
+                                words[i].compareTo(toReturn.get(insertIndex - 1)) < 0) {
+                            insertIndex -= 1;
+                        }
+                    }
+
+                    else {
+                        insertIndex = toReturnValues.size();
+                    }
+
+                    toReturn.add(insertIndex, words[i]);
+                    toReturnValues.add(insertIndex, lev);
+                }
+                else {
+                    toReturn.add(words[i]);
+                    toReturnValues.add(lev);
+                }
+            }
+        }
+
+        System.out.println(toReturn.size());
+        for (String word: toReturn) {
+            System.out.println(word);
+        }
+
+        return toReturn.toArray(new String[0]);
     }
 
+    public int lev(int[][] changes, String str1, String str2) {
+        int str1Len = str1.length();
+        int str2Len = str2.length();
+
+        changes[0][0] = 0;
+
+        for (int i = 1; i <= str1Len; i++) {
+            changes[i][0] = i;
+        }
+
+        for (int j = 1; j <= str2Len; j++) {
+            changes[0][j] = j;
+        }
+
+        for (int i = 1; i <= str1Len; i++) {
+            for (int j = 1; j <= str2Len; j++) {
+                if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
+                    changes[i][j] = changes[i - 1][j - 1];
+                }
+                else {
+                    changes[i][j] = 1 + Math.min(changes[i - 1][j - 1], Math.min(changes[i][j - 1], changes[i - 1][j]));
+                }
+            }
+        }
+
+        return changes[str1Len][str2Len];
+    }
 
     /**
      * Loads a dictionary of words from the provided textfiles in the dictionaries directory.

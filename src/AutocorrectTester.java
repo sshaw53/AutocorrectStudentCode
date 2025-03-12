@@ -3,6 +3,7 @@ import org.junit.jupiter.api.Timeout;
 import java.io.*;
 import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class AutocorrectTester {
     private Autocorrect studentSolution;
