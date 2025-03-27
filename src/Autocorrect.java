@@ -25,7 +25,7 @@ public class Autocorrect {
     int threshold;
     public static final int SHORT_CUTOFF = 5;
     public static final int RADIX = 26;
-    public static final int LONGEST_LEN = 15;
+    public static final int LONGEST_LEN = 70;
     public static final int Q = 131071;
     public ArrayList<String> toReturn;
     public ArrayList<Integer> toReturnValues;
@@ -38,7 +38,7 @@ public class Autocorrect {
     }
 
     public static void main(String[] args) {
-        String[] words = loadDictionary("small");
+        String[] words = loadDictionary("large");
         Autocorrect autocorrect = new Autocorrect(words, 2);
         autocorrect.run();
     }
@@ -51,6 +51,16 @@ public class Autocorrect {
             String typed = scanner.nextLine();
             System.out.print("Did you mean to say: ");
 
+            int typedLen = typed.length();
+
+            // Changing nGram based on length of the word
+            if (typedLen >= 9 && typedLen < 12) {
+                nGram = 3;
+            }
+            if (typedLen >= 12) {
+                nGram = 4;
+            }
+
             // Process to find and organize the potential words
             int wordLen = words.length;
             ArrayList[] sortedDict = new ArrayList[Q];
@@ -60,7 +70,6 @@ public class Autocorrect {
 
             // Create a hash set
             HashSet<String> filtered = new HashSet<>();
-            int typedLen = typed.length();
 
             filterOptions(filtered, sortedDict, lenDict, typed, typedLen, nGram);
 
@@ -70,9 +79,23 @@ public class Autocorrect {
             // Sort the arrayList
             sortArray(filteredArray, typed);
 
-            // Print out possible words
-            System.out.println(toReturn.toArray(new String[0])[0] + ", " + toReturn.toArray(new String[0])[1] + ", or " +
-                    toReturn.toArray(new String[0])[2] + "?");
+            // Print out possible words (had to add shorter options for if the options were less - for smaller dict)
+            if (toReturn.toArray(new String[0]).length == 0) {
+                System.out.println("No viable matches");
+            }
+            else if (toReturn.toArray(new String[0]).length == 1) {
+                System.out.println(toReturn.toArray(new String[0])[0] + "?");
+            }
+            else if (toReturn.toArray(new String[0]).length == 2) {
+                System.out.println(toReturn.toArray(new String[0])[0] + " or " + toReturn.toArray(new String[0])[1] + "?");
+            }
+            else {
+                System.out.println(toReturn.toArray(new String[0])[0] + ", " + toReturn.toArray(new String[0])[1] + ", or " +
+                        toReturn.toArray(new String[0])[2] + "?");
+            }
+
+            toReturn.clear();
+            toReturnValues.clear();
         }
     }
 
@@ -92,7 +115,7 @@ public class Autocorrect {
         // For every word in the dictionary, hash by n-grams --> add to sortedDict
         for (int i = 0; i < wordLen; i++) {
             // Get first hash and add it to the new data Structure
-            if (words[i].length() > 2) {
+            if (words[i].length() > nGram) {
                 int hash = hash(words[i], nGram);
                 sortedDict[hash].add(words[i]);
 
@@ -115,7 +138,7 @@ public class Autocorrect {
 
     public void filterOptions(HashSet<String> filtered, ArrayList[] sortedDict, ArrayList[] lenDict, String typed,
                               int typedLen, int nGram) {
-        // Get first hash, add everything in that index to the hash set - ONLY do this when there are 4+ letters in typed
+        // Get first hash, add everything in that index to the hash set - ONLY do this when there are 6+ letters in typed
         if (typedLen > SHORT_CUTOFF) {
             int hash = hash(typed, nGram);
             filtered.addAll(sortedDict[hash]);
